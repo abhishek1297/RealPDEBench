@@ -26,6 +26,13 @@
 ------
 
 
+## ‼️ News
+
+[2026.07] The NeurIPS [RealPDE Competition](https://realpdecompetition.github.io/) is now live! Join us to tackle real-world physical systems, with generous prizes for winning teams.
+
+------
+
+
 ## 💧🔥 Overview
 
 RealPDEBench is the first scientific ML benchmark with **paired real-world measurements and matched numerical simulations**
