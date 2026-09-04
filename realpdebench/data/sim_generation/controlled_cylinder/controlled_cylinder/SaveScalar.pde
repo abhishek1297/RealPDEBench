@@ -12,7 +12,6 @@
 class SaveScalar{
   PVector force;
   PrintWriter output;
-  Pinball test;  
   int n;
   float r;
   float  resolution, xi1, xi2, theta, D;

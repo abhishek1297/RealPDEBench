@@ -8,6 +8,8 @@ import argparse
 from gym.spaces import Box
 import os
 import signal
+import shlex
+import shutil
 from multiprocessing import Process, Queue
 
 def is_port_in_use(port: int) -> bool:
@@ -37,6 +39,21 @@ class env:
         self.epoch_i = 0
         self.args = config
 
+        processing_java = getattr(
+            config,
+            'processing_java',
+            os.environ.get('PROCESSING_JAVA', '/workspace/processing-4.3/processing-java'),
+        )
+        if shutil.which('xvfb-run') is None:
+            raise FileNotFoundError(
+                "xvfb-run is required; install the system package 'xvfb'"
+            )
+        if shutil.which(processing_java) is None:
+            raise FileNotFoundError(
+                f"Processing executable not found: {processing_java}. "
+                "Set PROCESSING_JAVA to the path of processing-java."
+            )
+
         while True:
             port = random.randint(2000, 40000)
             if not is_port_in_use(port):
@@ -44,10 +61,14 @@ class env:
         
         display_num = network_port
                 
-        self.xvfb_process = start_xvfb(display_num)
-
         if local_port == None:
-            self.server = subprocess.Popen(f'xvfb-run --server-num={display_num} -a /workspace/processing-4.3/processing-java --sketch={config.path_env}{config.name_env} --run {port} {info}', shell=True)
+            command = (
+                f'xvfb-run --server-num={display_num} -a '
+                f'{shlex.quote(processing_java)} '
+                f'--sketch={shlex.quote(config.path_env + config.name_env)} '
+                f'--run {port} {info}'
+            )
+            self.server = subprocess.Popen(command, shell=True)
             time.sleep(20)
             print("server start")
             self.proxy = ServerProxy(f"http://localhost:{port}/")
@@ -104,9 +125,9 @@ class env:
 
     def parseReset(self, info): 
         
-        matrix_u = np.zeros((128, 128, 1))
-        matrix_v = np.zeros((128, 128, 1))
-        matrix_p = np.zeros((128, 128, 1))
+        matrix_u = np.zeros((384, 384, 1))
+        matrix_v = np.zeros((384, 384, 1))
+        matrix_p = np.zeros((384, 384, 1))
         boundary_x = np.zeros((self.args.num_structure, 40, 1))
         boundary_y = np.zeros((self.args.num_structure, 40, 1))
         
@@ -164,9 +185,9 @@ class env:
     def parseStep(self, info, epoch_i, i): 
             
         state = []
-        matrix_u = np.zeros((128, 128, 1))
-        matrix_v = np.zeros((128, 128, 1))
-        matrix_p = np.zeros((128, 128, 1))
+        matrix_u = np.zeros((384, 384, 1))
+        matrix_v = np.zeros((384, 384, 1))
+        matrix_p = np.zeros((384, 384, 1))
         boundary_x = np.zeros((self.args.num_structure, 40, 1))
         boundary_y = np.zeros((self.args.num_structure, 40, 1))
         done = False

@@ -27,3 +27,7 @@ sandbox/
 real_benchmark_old/
 scripts/
 hf_upload_test/
+
+# new
+trajectories
+.vscode
