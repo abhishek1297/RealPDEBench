@@ -245,6 +245,28 @@ python3 plot_trajectory.py \
   --save trajectories/trajectory_000.gif
 ```
 
+### Plot a frame range
+
+Use `--start-frame` and `--end-frame` to plot a NumPy-style half-open slice:
+
+```text
+trajectory[start_frame:end_frame]
+```
+
+For example, plot saved frames 200 through 499:
+
+```bash
+python3 plot_trajectory.py \
+  trajectories/ccylinder/trajectory_000.npy \
+  --start-frame 200 \
+  --end-frame 500 \
+  --save trajectories/ccylinder/trajectory_000-200-500.gif
+```
+
+`--start-frame` is inclusive and `--end-frame` is exclusive. The valid range
+is `0 <= start < end <= number_of_saved_frames`. The plot titles retain the
+original frame numbers after slicing.
+
 If the host does not have Matplotlib, run the plotter in the image:
 
 ```bash

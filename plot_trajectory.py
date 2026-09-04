@@ -35,9 +35,25 @@ def main():
     parser.add_argument("--interval", type=int, default=100, help="milliseconds between frames")
     parser.add_argument("--save", type=Path, help="save animation as .gif or .mp4")
     parser.add_argument("--frame", type=int, help="show one frame instead of animating")
+    parser.add_argument("--start-frame", type=int, default=0,
+                        help="first frame, inclusive; default: 0")
+    parser.add_argument("--end-frame", type=int,
+                        help="last frame, exclusive; default: end of trajectory")
     args = parser.parse_args()
 
     trajectory, fields = load_trajectory(args.trajectory)
+    total_frames = fields.shape[0]
+    end_frame = total_frames if args.end_frame is None else args.end_frame
+    if not 0 <= args.start_frame < end_frame <= total_frames:
+        raise ValueError(
+            f"frame range must satisfy 0 <= start < end <= {total_frames}"
+        )
+    frame_offset = args.start_frame
+    fields = fields[args.start_frame:end_frame]
+    if "boundaries" in trajectory:
+        trajectory["boundaries"] = np.asarray(trajectory["boundaries"])[
+            args.start_frame:end_frame
+        ]
     components = [args.component] if args.component else ["u", "v", "p", "speed"]
     values = {}
     for component in components:
@@ -71,7 +87,7 @@ def main():
         axis.set_xlabel("x grid index")
         axis.set_ylabel("y grid index")
         images.append(image)
-        titles.append(axis.set_title(f"{component}, frame {frame_index}"))
+        titles.append(axis.set_title(f"{component}, frame {frame_index + frame_offset}"))
 
     boundaries = np.asarray(trajectory.get("boundaries", []))
     boundary_lines = []
@@ -84,7 +100,7 @@ def main():
     def draw(frame):
         for image, title, component in zip(images, titles, components):
             image.set_data(values[component][frame])
-            title.set_text(f"{component}, frame {frame}")
+            title.set_text(f"{component}, frame {frame + frame_offset}")
         boundary_index = 0
         for axis in axes:
             for body in range(boundaries.shape[1] if boundaries.ndim == 4 else 0):
