@@ -37,6 +37,22 @@ The controlled-cylinder parameter row has two values:
 - `Re`: Reynolds number. Larger values produce a more strongly unsteady wake.
 - `dia_0`: cylinder diameter in the solver's nondimensional parameterization.
 
+### Parameter ranges
+
+The repository does not define an explicit sampling interval for either
+controlled-cylinder parameter. In particular, no `parameters.npy` file or
+`min`/`max` sampling configuration is included in the repository. Therefore,
+the ranges in the requested `(min, max]` notation are:
+
+| Parameter | Range in repository | Available reference value |
+| --- | --- | --- |
+| `Re` | not specified | Processing default `100` |
+| `dia_0` | not specified | Processing default `1.0` |
+
+Values such as `Re=1000` or `Re=2000` in examples are experiment choices, not
+repository-defined bounds. Choose a range based on the flow regime you want
+and verify numerical stability for the selected grid and time step.
+
 The runner uses a zero control action (`v1=0`) and appends the parameter row to
 form the solver action:
 
@@ -104,6 +120,24 @@ The FSI parameter row has five values:
 - `massR_C`: cylinder mass ratio.
 - `dia_0`: diameter of the first cylinder.
 - `dia_1`: diameter of the second cylinder.
+
+### Parameter ranges
+
+No explicit `(min, max]` sampling bounds are defined in the repository for the
+FSI initial-condition parameters. The available code-level reference values
+are:
+
+| Parameter | Range in repository | Available reference value |
+| --- | --- | --- |
+| `Re` | not specified | Processing default `3272`; `Test0.pde` comment mentions `6000` |
+| `epi_C` | not specified | Processing default `0.8` |
+| `massR_C` | not specified | Processing default `15`; `Test0.pde` internal default `18.2` |
+| `dia_0` | not specified | Python example `0.1`; not consumed by current FSI setup |
+| `dia_1` | not specified | Python example `0.1`; not consumed by current FSI setup |
+
+The defaults and comments above are reference values, not validated parameter
+bounds. The current repository does not provide enough information to state a
+defensible `(min, max]` interval for FSI sampling.
 
 The runner uses two zero control actions (`v1=0`, `v2=0`) and forms:
 
